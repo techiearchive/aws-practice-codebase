@@ -75,3 +75,6 @@
   "x-amazon-apigateway-binary-media-types" : [ "image/jpeg" ]
 }
 ```
+
+# Reference:
+[api-gateway-upload-image-s3](https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-upload-image-s3/)
