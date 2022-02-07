@@ -9,7 +9,7 @@
     "version" : "2022-01-27T16:10:46Z"
   },
   "servers" : [ {
-    "url" : "https://hk0ktiwzuf.execute-api.us-east-1.amazonaws.com/{basePath}",
+    "url" : "https://<api-key>.execute-api.us-east-1.amazonaws.com/{basePath}",
     "variables" : {
       "basePath" : {
         "default" : "/v1"
