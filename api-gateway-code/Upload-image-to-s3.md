@@ -8,7 +8,7 @@
     "version" : "2022-01-25T14:57:23Z"
   },
   "servers" : [ {
-    "url" : "https://rxk1seekb6.execute-api.us-east-1.amazonaws.com/{basePath}",
+    "url" : "https://<api-key>.execute-api.us-east-1.amazonaws.com/{basePath}",
     "variables" : {
       "basePath" : {
         "default" : "/v1"
@@ -46,7 +46,7 @@
           }
         },
         "x-amazon-apigateway-integration" : {
-          "credentials" : "arn:aws:iam::731661497276:role/api-gateway-upload-to-s3",
+          "credentials" : "<Iam role>",
           "httpMethod" : "PUT",
           "uri" : "arn:aws:apigateway:us-east-1:s3:path/{bucket}/{key}",
           "responses" : {
