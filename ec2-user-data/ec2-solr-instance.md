@@ -1,4 +1,4 @@
-# User data to prepare solr instance with Amazon Linux 2 AMI on EC2
+# User data to prepare solr instance (master and slave) with Amazon Linux 2 AMI on EC2
 
 ```
 #!/bin/bash
