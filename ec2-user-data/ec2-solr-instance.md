@@ -8,7 +8,7 @@ sudo yum update -y
 sudo yum install java-11 -y
 java -version
 wget http://archive.apache.org/dist/lucene/solr/7.5.0/solr-7.5.0.tgz
-tar -zxvf solr-7.5.0.tgz solr-7.5.0/bin/install_solr_service.sh
+tar -zxvf solr-7.5.0.tgz solr-7.5.0/bin/install_solr_service.sh --strip-components=2
 
 echo "==========Solr Master instance installation ========"
 cd solr-7.5.0/bin
