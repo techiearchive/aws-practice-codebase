@@ -57,3 +57,4 @@ jobs:
         with:
           name: presigned-urls
           path: urls.txt
+          retention-days: 2
