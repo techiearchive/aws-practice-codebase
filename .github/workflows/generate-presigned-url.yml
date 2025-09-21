@@ -12,7 +12,10 @@ on:
       action:
         description: "Operation: get (download) or put (upload)"
         required: true
-        default: "get"
+        type: choice
+        options:
+          - get
+          - put
       expiry:
         description: "Expiry time in seconds"
         required: false
