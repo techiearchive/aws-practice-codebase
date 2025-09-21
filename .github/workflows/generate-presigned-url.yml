@@ -1,4 +1,4 @@
-name: Generate S3 Presigned URL
+name: Generate S3 Presigned URLs
 
 on:
   workflow_dispatch:
@@ -6,8 +6,8 @@ on:
       bucket:
         description: "S3 bucket name"
         required: true
-      key:
-        description: "S3 object key (file path in bucket)"
+      keys:
+        description: "Comma-separated list of S3 object keys (file paths)"
         required: true
       action:
         description: "Operation: get (download) or put (upload)"
@@ -27,23 +27,33 @@ jobs:
         with:
           aws-access-key-id: ${{ vars.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ vars.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ vars.S3_BUCKET_NAME }}
 
-      - name: Generate presigned URL
+      - name: Generate presigned URLs
         id: presign
         run: |
-          if [ "${{ github.event.inputs.action }}" = "put" ]; then
-            url=$(aws s3 presign s3://${{ github.event.inputs.bucket }}/${{ github.event.inputs.key }} \
-              --expires-in ${{ github.event.inputs.expiry }} \
-              --http-method PUT)
-            echo "✅ Presigned PUT URL (upload, expires in ${{ github.event.inputs.expiry }} seconds):"
-          else
-            url=$(aws s3 presign s3://${{ github.event.inputs.bucket }}/${{ github.event.inputs.key }} \
-              --expires-in ${{ github.event.inputs.expiry }})
-            echo "✅ Presigned GET URL (download, expires in ${{ github.event.inputs.expiry }} seconds):"
-          fi
+          echo "✅ Generating pre-signed URLs for action=${{ github.event.inputs.action }}"
+          echo "" > urls.txt
+          
+          IFS=',' read -ra KEYS <<< "${{ github.event.inputs.keys }}"
+          for key in "${KEYS[@]}"; do
+            key=$(echo $key | xargs) # trim spaces
+            if [ "${{ github.event.inputs.action }}" = "put" ]; then
+              url=$(aws s3 presign s3://${{ github.event.inputs.bucket }}/$key \
+                --expires-in ${{ github.event.inputs.expiry }} \
+                --http-method PUT)
+              echo "PUT URL for $key:" | tee -a urls.txt
+            else
+              url=$(aws s3 presign s3://${{ github.event.inputs.bucket }}/$key \
+                --expires-in ${{ github.event.inputs.expiry }})
+              echo "GET URL for $key:" | tee -a urls.txt
+            fi
+            echo "$url" | tee -a urls.txt
+            echo "" | tee -a urls.txt
+          done
 
-          echo ""
-          echo "$url"
-          echo ""
-          echo "url=$url" >> $GITHUB_OUTPUT
+      - name: Upload all URLs as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: presigned-urls
+          path: urls.txt
