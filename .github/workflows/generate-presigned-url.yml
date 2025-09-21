@@ -1,0 +1,49 @@
+name: Generate S3 Presigned URL
+
+on:
+  workflow_dispatch:
+    inputs:
+      bucket:
+        description: "S3 bucket name"
+        required: true
+      key:
+        description: "S3 object key (file path in bucket)"
+        required: true
+      action:
+        description: "Operation: get (download) or put (upload)"
+        required: true
+        default: "get"
+      expiry:
+        description: "Expiry time in seconds"
+        required: false
+        default: "3600"
+
+jobs:
+  presign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.S3_BUCKET_NAME }}
+
+      - name: Generate presigned URL
+        id: presign
+        run: |
+          if [ "${{ github.event.inputs.action }}" = "put" ]; then
+            url=$(aws s3 presign s3://${{ github.event.inputs.bucket }}/${{ github.event.inputs.key }} \
+              --expires-in ${{ github.event.inputs.expiry }} \
+              --http-method PUT)
+            echo "✅ Presigned PUT URL (upload, expires in ${{ github.event.inputs.expiry }} seconds):"
+          else
+            url=$(aws s3 presign s3://${{ github.event.inputs.bucket }}/${{ github.event.inputs.key }} \
+              --expires-in ${{ github.event.inputs.expiry }})
+            echo "✅ Presigned GET URL (download, expires in ${{ github.event.inputs.expiry }} seconds):"
+          fi
+
+          echo ""
+          echo "$url"
+          echo ""
+          echo "url=$url" >> $GITHUB_OUTPUT
